@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createPortal } from '../server/index.mjs';
+import JSZip from 'jszip';
 
 async function usingPortal(run, options = {}) {
   const portal = await createPortal({ log: () => {}, ...options });
@@ -279,6 +280,70 @@ test('Malformed files, invalid rules, cross-origin writes, path traversal and up
     { maxUploadBytes: 2048 },
   ));
 
+test('Playground accepts exactly 3 MB and rejects larger CSV/XLSX even with a higher configured limit', async () =>
+  usingPortal(
+    async ({ upload, request, get }) => {
+      assert.equal((await get('/api/session')).maxUploadBytes, 3_000_000);
+      const header = 'id,amount\n';
+      const full = header + 'A,1\n'.repeat(Math.floor((3_000_000 - header.length) / 4)) + 'A,';
+      assert.equal(Buffer.byteLength(full), 3_000_000);
+      assert.equal((await upload('left', full)).size, 3_000_000);
+      for (const name of ['oversize.csv', 'oversize.xlsx']) {
+        const res = await request(`/api/sources?side=right&name=${name}`, {
+          method: 'POST',
+          body: full + '\n',
+        });
+        assert.equal(res.status, 413);
+        assert.match((await res.json()).error, /maximum 3 MB/);
+      }
+      assert.equal((await get('/api/session')).sources.length, 1);
+    },
+    { maxUploadBytes: 128 * 1024 * 1024 },
+  ));
+
+test('Chunked uploads cannot bypass the byte limit and receive HTTP 413 with no stored source', async () =>
+  usingPortal(
+    async ({ request, get, portal }) => {
+      const chunks = async function* () {
+        for (let i = 0; i < 4; i++) yield Buffer.alloc(1024, 97);
+      };
+      const response = await request('/api/sources?side=left&name=chunked.csv', {
+        method: 'POST',
+        body: chunks(),
+        duplex: 'half',
+      });
+      assert.equal(response.status, 413);
+      assert.match((await response.json()).error, /upload limit/);
+      assert.equal((await get('/api/session')).sources.length, 0);
+      assert.equal(portal.workspace.uploads, 0);
+    },
+    { maxUploadBytes: 2048 },
+  ));
+
+test('Aborted streaming uploads clean their partial file and release the upload slot', async () =>
+  usingPortal(async ({ request, get, portal }) => {
+    await get('/api/session');
+    const controller = new AbortController();
+    const chunks = async function* () {
+      yield Buffer.from('id,amount\nA,1\n');
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      controller.abort();
+    };
+    await assert.rejects(
+      request('/api/sources?side=left&name=aborted.csv', {
+        method: 'POST',
+        body: chunks(),
+        duplex: 'half',
+        signal: controller.signal,
+      }),
+      { name: 'AbortError' },
+    );
+    for (let i = 0; i < 100 && portal.workspace.uploads; i++)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    assert.equal(portal.workspace.uploads, 0);
+    assert.equal((await get('/api/session')).sources.length, 0);
+  }));
+
 test('Repeated uploads reuse the same immutable snapshot; parsing settings remain separate', async () =>
   usingPortal(async ({ upload, get }) => {
     const content = 'id,amount\nA,1\n';
@@ -337,11 +402,27 @@ test('Failure after matching starts blocks exports and retains provisional trace
 
 test('Oversized matching groups fail before allocating their payloads in core memory', async () =>
   usingPortal(async ({ upload, start, wait, request }) => {
-    const csv =
-      'id,amount,note\n' +
-      Array.from({ length: 75 }, () => `A,1,${'x'.repeat(60000)}`).join('\n') +
-      '\n';
-    const left = await upload('left', csv);
+    const zip = await JSZip.loadAsync(
+      await readFile(fileURLToPath(new URL('../public/samples/bank-left.xlsx', import.meta.url))),
+    );
+    const rows = [
+      ['id', 'amount', 'note'],
+      ...Array.from({ length: 75 }, () => ['A', '1', 'x'.repeat(60000)]),
+    ];
+    zip.file(
+      'xl/worksheets/sheet1.xml',
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' +
+        rows
+          .map(
+            (row, index) =>
+              `<row r="${index + 1}">${row.map((value, column) => `<c r="${String.fromCharCode(65 + column)}${index + 1}" t="inlineStr"><is><t>${value}</t></is></c>`).join('')}</row>`,
+          )
+          .join('') +
+        '</sheetData></worksheet>',
+    );
+    const compressed = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
+    assert.ok(compressed.length < 3_000_000);
+    const left = await upload('left', compressed, 'left.xlsx');
     const right = await upload('right', 'id,amount,note\nA,1,x\n');
     const { job } = await start(left, right, rules);
     const done = await wait(job.id);

@@ -11,14 +11,18 @@ import { createSortKey, reconcileSorted } from '@qpv-systems/core-reconcile';
 import { sourceRows } from './rows.mjs';
 import { makeRules } from './rules.mjs';
 
+export const MAX_UPLOAD_BYTES = 3_000_000;
+
 export class PortalWorkspace {
   constructor({
-    maxUploadBytes = 128 * 1024 * 1024,
+    maxUploadBytes = MAX_UPLOAD_BYTES,
     maxRows = 2_000_000,
     maxJobBytes = 1024 * 1024 * 1024,
     log = console.log,
   } = {}) {
-    this.maxUploadBytes = maxUploadBytes;
+    if (!Number.isSafeInteger(maxUploadBytes) || maxUploadBytes < 1)
+      throw new Error('maxUploadBytes must be a positive safe integer.');
+    this.maxUploadBytes = Math.min(maxUploadBytes, MAX_UPLOAD_BYTES);
     this.maxRows = maxRows;
     this.maxJobBytes = maxJobBytes;
     this.log = log;
@@ -93,8 +97,14 @@ export class PortalWorkspace {
     if ((typeof sheet === 'number' && (sheet < 1 || sheet > 128)) || suppliedSheet.length > 100)
       throw new Error('Invalid Excel sheet name or index.');
     const declaredSize = Number(request.headers['content-length'] ?? 0);
-    if (declaredSize > this.maxUploadBytes)
-      throw Object.assign(new Error('File exceeds the upload limit.'), { status: 413 });
+    const sizeError = () =>
+      Object.assign(
+        new Error(
+          `File exceeds the ${this.maxUploadBytes.toLocaleString('en-US')} byte upload limit (maximum 3 MB per file).`,
+        ),
+        { status: 413 },
+      );
+    if (declaredSize > this.maxUploadBytes) throw sizeError();
     const id = randomUUID();
     const path = join(session.folder, `${id}.${format}`);
     const hash = createHash('sha256');
@@ -103,7 +113,7 @@ export class PortalWorkspace {
       transform: (chunk, _encoding, callback) => {
         size += chunk.length;
         if (size > this.maxUploadBytes) {
-          callback(Object.assign(new Error('File exceeds the upload limit.'), { status: 413 }));
+          callback(sizeError());
           return;
         }
         hash.update(chunk);
@@ -112,8 +122,13 @@ export class PortalWorkspace {
     });
     session.uploading++;
     this.uploads++;
+    const forwardError = (error) => counter.destroy(error);
+    request.on('error', forwardError);
+    request.once('close', () => request.off('error', forwardError));
     try {
-      await pipeline(request, counter, createWriteStream(path, { flags: 'wx' }));
+      // Keep the HTTP request outside pipeline so an oversize stream can receive HTTP 413.
+      request.pipe(counter);
+      await pipeline(counter, createWriteStream(path, { flags: 'wx' }));
       if (!size) throw new Error('File is empty.');
       const digest = hash.digest('hex');
       const source = {
@@ -163,6 +178,8 @@ export class PortalWorkspace {
       await rm(path, { force: true });
       throw error;
     } finally {
+      request.unpipe(counter);
+      if (!request.complete) request.resume();
       session.uploading--;
       this.uploads--;
       session.touched = Date.now();

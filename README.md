@@ -21,7 +21,7 @@ The declared dependency is `@qpv-systems/core-reconcile@^0.1.0`. Registry instal
 
 ## Try a reconciliation
 
-1. Select a domain template and click **Dùng bộ mẫu này**, or upload your own left/right `.csv` or `.xlsx` files.
+1. Select a domain template and click **Dùng bộ mẫu này**, or upload your own left/right `.csv` or `.xlsx` files, **up to 3 MB each** (3,000,000 bytes).
 2. Inspect the first five rows. Set CSV delimiter or Excel sheet/header row **before** upload. Confirm each source is complete only when your business batch is complete.
 3. Choose the matching columns for each source. Add components for a composite identifier, such as SKU + warehouse or employee + pay period.
 4. Choose comparison fields, their meaning, exact/decimal comparison, absolute tolerance, and missing-value policy.
@@ -105,7 +105,7 @@ CSV parsing uses [`csv-parse`](https://csv.js.org/parse/options/) with BOM, quot
 
 | Limit                 | Default                                                         |
 | --------------------- | --------------------------------------------------------------- |
-| Per file              | 128 MiB (`MAX_UPLOAD_BYTES`)                                    |
+| Per file              | 3 MB (3,000,000 bytes), enforced by UI and backend              |
 | Rows per source       | 2,000,000 (`MAX_ROWS`)                                          |
 | SQLite file per run   | 1 GiB (`MAX_JOB_BYTES`), checked at commit checkpoints          |
 | XLSX expanded content | 512 MiB                                                         |
@@ -131,11 +131,11 @@ npm test
 npm run test:memory
 ```
 
-Integration tests exercise actual npm imports, unsorted CSV, all six CSV/XLSX presets, exact large decimals, refund rows, duplicates, missing/incomplete data, retry history, concurrent submissions, cancellation, malformed files, upload limits, origin/session isolation, Unicode ordering and report completeness. The memory check processes 100,000 pairs end to end under a 64 MiB V8 old-space budget and a 2 GiB disk budget; RSS also includes native SQLite/Node buffers and is not limited to 64 MiB. Set `MEMORY_ROWS=1000000` for a million-pair run. Large runs may reach the portal's default 1 GiB disk budget before the row limit; increase `MAX_JOB_BYTES` when hosting them.
+Integration tests exercise actual npm imports, unsorted CSV, all six CSV/XLSX presets, exact large decimals, refund rows, duplicates, missing/incomplete data, retry history, concurrent submissions, cancellation, malformed files, upload limits, origin/session isolation, Unicode ordering and report completeness. The memory check processes 50,000 pairs end to end under a 64 MiB V8 old-space budget with inputs below the 3 MB cap. RSS also includes native SQLite/Node buffers and is not limited to 64 MiB. Larger-data benchmarks belong in the core package; the playground never raises its upload cap for benchmarks.
 
 CI always runs source checks. Before the core npm release exists, its summary explicitly states that npm integration tests **did not run**. After `0.1.0` is published, re-run CI: it installs npm dependencies and runs formatting, integration tests on Windows/Linux with Node 22.18/24, and the memory check. Add the generated npm lockfile after the registry release and switch to `npm ci` for reproducible installations; the current repository does not commit a lockfile pointing to a local tarball.
 
-An initial local Windows/Node 24 benchmark completed **1,000,000 matched pairs** (two unsorted CSV inputs with exact large decimals) in **166 seconds**, with **32 MiB peak heap** and **153 MiB peak RSS**, under a 64 MiB old-space limit and 2 GiB disk budget. This measures the upload/staging/reconciliation path for that synthetic data profile; it is not a guarantee for arbitrary record sizes, many duplicate keys, or your hosting hardware.
+The upload cap is intentionally small because this website is a playground. `MAX_UPLOAD_BYTES` can lower the limit; values above 3,000,000 are clamped to 3,000,000. Oversized files are rejected by the browser before upload and by the backend with HTTP 413, including requests without Content-Length. The limit applies to the uploaded file; XLSX expanded content has its own separate bound.
 
 ## Deploy a website
 

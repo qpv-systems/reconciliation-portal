@@ -4,7 +4,7 @@ import { stat } from 'node:fs/promises';
 import { once } from 'node:events';
 import { join } from 'node:path';
 import { createPortal } from '../server/index.mjs';
-const rows = Number(process.env.MEMORY_ROWS ?? 100_000);
+const rows = Number(process.env.MEMORY_ROWS ?? 50_000);
 assert.ok(Number.isSafeInteger(rows) && rows > 0 && rows <= 2_000_000);
 const diskBudget = Number(process.env.MAX_JOB_BYTES ?? 2 * 1024 * 1024 * 1024);
 const portal = await createPortal({ log: () => {}, maxJobBytes: diskBudget });
@@ -31,6 +31,10 @@ try {
   out.end();
   await once(out, 'finish');
   const size = (await stat(file)).size;
+  assert.ok(
+    size <= portal.workspace.maxUploadBytes,
+    'Generated file exceeds the playground 3 MB cap. Reduce MEMORY_ROWS; large-data benchmarks belong in the core package.',
+  );
   let cookie;
   const sources = [];
   const started = Date.now();

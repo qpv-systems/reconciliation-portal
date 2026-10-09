@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { resolve, join, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PortalWorkspace } from './workspace.mjs';
+import { PortalWorkspace, MAX_UPLOAD_BYTES } from './workspace.mjs';
 import { csvCell } from './rows.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -330,6 +330,7 @@ export async function createPortal(options = {}) {
         stream.pipe(res);
       }
     } catch (error) {
+      if (error.status === 413 && !res.headersSent) res.setHeader('Connection', 'close');
       if (!res.headersSent && !res.destroyed)
         json(res, error.status ?? 400, { error: error.message });
       else if (!res.destroyed) res.destroy();
@@ -359,7 +360,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     return value;
   };
   const portal = await createPortal({
-    maxUploadBytes: number('MAX_UPLOAD_BYTES', 128 * 1024 * 1024),
+    maxUploadBytes: number('MAX_UPLOAD_BYTES', MAX_UPLOAD_BYTES),
     maxRows: number('MAX_ROWS', 2_000_000),
     maxJobBytes: number('MAX_JOB_BYTES', 1024 * 1024 * 1024),
     publicOrigin: process.env.PUBLIC_ORIGIN,

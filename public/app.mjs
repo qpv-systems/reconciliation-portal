@@ -34,7 +34,7 @@ const state = {
   page: [],
   total: 0,
   pageRevision: 0,
-  maxUploadBytes: 128 * 1024 * 1024,
+  maxUploadBytes: 3_000_000,
 };
 const esc = (value) =>
   String(value ?? '')
@@ -197,7 +197,7 @@ function resetResults() {
 }
 async function uploadFile(side, file) {
   if (file.size > state.maxUploadBytes)
-    throw new Error(`File vượt giới hạn ${number(state.maxUploadBytes / 1024 / 1024)} MiB.`);
+    throw new Error(`File vượt giới hạn ${number(state.maxUploadBytes / 1_000_000)} MB mỗi file.`);
   const params = new URLSearchParams({
     side,
     name: file.name,
@@ -213,6 +213,10 @@ async function uploadFile(side, file) {
 }
 async function handleFile(side, file) {
   if (!file || state.busy) return;
+  if (file.size > state.maxUploadBytes) {
+    notify(`File vượt giới hạn ${number(state.maxUploadBytes / 1_000_000)} MB mỗi file.`, true);
+    return;
+  }
   busy(true);
   resetResults();
   state.draft = undefined;
@@ -628,7 +632,8 @@ $('next').addEventListener('click', () => {
 try {
   const [session, catalog] = await Promise.all([api('/api/session'), api('/samples/catalog.json')]);
   state.catalog = catalog;
-  state.maxUploadBytes = session.maxUploadBytes;
+  state.maxUploadBytes = Math.min(session.maxUploadBytes, 3_000_000);
+  $('upload-limit').textContent = `Tối đa ${number(state.maxUploadBytes / 1_000_000)} MB mỗi file.`;
   selectTemplate('bank');
   $('batch-id').value = `batch-${new Date().toISOString().slice(0, 10)}`;
   let previous = session.jobs.at(-1);
