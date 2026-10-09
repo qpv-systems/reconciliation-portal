@@ -1,0 +1,5 @@
+"invoice_no","net_amount","tax_amount","currency","payment_status"
+"INV03","1500","150","USD","PAID"
+"INV01","9007199254740993.01","0","USD","PAID"
+"INV02","2000","200","USD","UNPAID"
+"INV04","500","50","EUR","PAID"

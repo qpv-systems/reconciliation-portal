@@ -1,0 +1,33 @@
+{
+  "name": "@qpv-systems/reconciliation-portal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Upload, configure, reconcile and inspect two datasets with Core Reconcile.",
+  "license": "MIT",
+  "author": "QPV Systems",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "start": "node server/index.mjs",
+    "dev": "node --watch server/index.mjs",
+    "test": "node --test test/portal.test.mjs",
+    "test:memory": "node --max-old-space-size=64 test/memory.mjs",
+    "check": "node --check server/index.mjs && node --check server/workspace.mjs && node --check server/rows.mjs && node --check server/rules.mjs && node --check public/app.mjs",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
+  },
+  "dependencies": {
+    "@qpv-systems/core-reconcile": "^0.1.0",
+    "csv-parse": "^7.0.3"
+  },
+  "devDependencies": {
+    "prettier": "3.9.9",
+    "jszip": "^3.10.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qpv-systems/reconciliation-portal.git"
+  }
+}

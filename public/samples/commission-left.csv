@@ -1,0 +1,5 @@
+"commission_id","commission_amount","adjustment","currency","state","agent_id"
+"C03","75","-5","USD","APPROVED","A02"
+"C01","100.25","0","USD","APPROVED","A01"
+"C02","250","10","USD","APPROVED","A01"
+"C04","80","0","USD","PENDING","A03"

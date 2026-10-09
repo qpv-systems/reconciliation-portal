@@ -1,0 +1,8 @@
+"transaction_id","amount","fee","status","currency","type"
+"B1001","100.00","1","SUCCESS","VND","PAYMENT"
+"B1002","200.50","2","SUCCESS","VND","PAYMENT"
+"B1003","-30","0","SUCCESS","EUR","REFUND"
+"B1004","50","0","SUCCESS","VND","PAYMENT"
+"B1005","90","1","SUCCESS","VND","PAYMENT"
+"B1006","80","0","SUCCESS","VND","PAYMENT"
+"B1007","","0","SUCCESS","VND","PAYMENT"

@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#147d73" />
+    <meta
+      name="description"
+      content="Upload CSV or Excel, choose your rules, and inspect real reconciliation results with Core Reconcile."
+    />
+    <title>Reconciliation Portal · QPV Systems</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.mjs"></script>
+  </head>
+  <body>
+    <header class="header">
+      <a class="brand" href="/"
+        ><span class="brand-icon">⇄</span
+        ><span>reconcile<span class="brand-sub">playground by QPV Systems</span></span></a
+      >
+      <nav aria-label="Liên kết">
+        <a
+          href="https://github.com/qpv-systems/core-reconcile#readme"
+          target="_blank"
+          rel="noreferrer"
+          >Package docs ↗</a
+        ><a
+          href="https://github.com/qpv-systems/reconciliation-portal"
+          target="_blank"
+          rel="noreferrer"
+          >GitHub ↗</a
+        ><span class="version">v0.1.0</span>
+      </nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">YOUR DATA. YOUR RULES.</p>
+          <h1>Hai nguồn dữ liệu.<br /><span>Một bức tranh rõ ràng.</span></h1>
+          <p class="hero-copy">
+            Thử đối soát với dữ liệu của bạn. Chọn cột, đặt quy tắc,<br class="desktop" />
+            và hiểu chính xác vì sao mỗi dòng khớp hoặc sai lệch.
+          </p>
+        </div>
+        <div class="hero-note">
+          <span class="live-dot"></span><strong>Powered by Core Reconcile</strong>
+          <p>Số tiền chính xác · Truy vết từng dòng<br />File lớn được xử lý trên server</p>
+          <a href="#samples">Chưa có file? Thử bộ dữ liệu mẫu ↓</a>
+        </div>
+      </section>
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+      <section class="panel" id="sources">
+        <div class="section-head">
+          <div class="step-title">
+            <span class="step">01</span>
+            <div>
+              <h2>Chọn hai nguồn dữ liệu</h2>
+              <p>Hai nguồn có thể dùng tên cột khác nhau. CSV UTF-8 hoặc Excel .xlsx.</p>
+            </div>
+          </div>
+          <button id="clear" class="button ghost">Xóa phiên làm việc</button>
+        </div>
+        <div class="source-grid">
+          <article class="source-card" data-side="left">
+            <div class="source-title">
+              <span class="side-label">L</span>
+              <h3>Nguồn trái</h3>
+              <span class="format-chip">CSV / XLSX</span>
+            </div>
+            <label class="dropzone" id="left-drop"
+              ><input id="left-file" type="file" accept=".csv,.xlsx" /><span class="upload-icon"
+                >↥</span
+              ><strong>Chọn file hoặc kéo thả vào đây</strong
+              ><span id="left-filename"
+                >Dữ liệu hệ thống, sổ cái, hoặc bất kỳ nguồn nào</span
+              ></label
+            >
+            <div class="file-options">
+              <label
+                >CSV delimiter<select id="left-delimiter">
+                  <option value=",">Dấu phẩy (,)</option>
+                  <option value=";">Dấu chấm phẩy (;)</option>
+                  <option value="&#9;">Tab</option>
+                  <option value="|">Dấu |</option>
+                </select></label
+              ><label
+                >Excel sheet<input
+                  id="left-sheet"
+                  value="1"
+                  aria-label="Excel sheet nguồn trái" /></label
+              ><label
+                >Dòng tiêu đề Excel<input
+                  id="left-header"
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value="1"
+              /></label>
+            </div>
+            <div id="left-preview" class="source-preview">
+              <p>Chưa có dữ liệu. Preview sẽ xuất hiện sau khi upload.</p>
+            </div>
+            <label class="complete-check"
+              ><input id="left-complete" type="checkbox" /><span
+                >Tôi xác nhận nguồn trái đã đầy đủ cho kỳ đối soát</span
+              ></label
+            >
+          </article>
+          <article class="source-card" data-side="right">
+            <div class="source-title">
+              <span class="side-label purple">R</span>
+              <h3>Nguồn phải</h3>
+              <span class="format-chip">CSV / XLSX</span>
+            </div>
+            <label class="dropzone" id="right-drop"
+              ><input id="right-file" type="file" accept=".csv,.xlsx" /><span class="upload-icon"
+                >↥</span
+              ><strong>Chọn file hoặc kéo thả vào đây</strong
+              ><span id="right-filename"
+                >Dữ liệu đối tác, ngân hàng, hoặc nguồn thứ hai</span
+              ></label
+            >
+            <div class="file-options">
+              <label
+                >CSV delimiter<select id="right-delimiter">
+                  <option value=",">Dấu phẩy (,)</option>
+                  <option value=";">Dấu chấm phẩy (;)</option>
+                  <option value="&#9;">Tab</option>
+                  <option value="|">Dấu |</option>
+                </select></label
+              ><label
+                >Excel sheet<input
+                  id="right-sheet"
+                  value="1"
+                  aria-label="Excel sheet nguồn phải" /></label
+              ><label
+                >Dòng tiêu đề Excel<input
+                  id="right-header"
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value="1"
+              /></label>
+            </div>
+            <div id="right-preview" class="source-preview">
+              <p>Chưa có dữ liệu. Preview sẽ xuất hiện sau khi upload.</p>
+            </div>
+            <label class="complete-check"
+              ><input id="right-complete" type="checkbox" /><span
+                >Tôi xác nhận nguồn phải đã đầy đủ cho kỳ đối soát</span
+              ></label
+            >
+          </article>
+        </div>
+        <p class="hint">
+          <span>ⓘ</span> Đọc hết file không đồng nghĩa với kỳ dữ liệu đã đầy đủ. Nếu chưa xác nhận,
+          dòng chưa tìm thấy ở nguồn đối diện sẽ cần kiểm tra lại.
+        </p>
+        <details class="sample-library" id="samples" open>
+          <summary>
+            <span>Thư viện dữ liệu mẫu</span><small>6 domain · tải file · sửa trên UI</small>
+          </summary>
+          <div id="sample-cards" class="sample-cards"></div>
+          <div id="sample-info" class="sample-info"></div>
+          <div class="sample-actions">
+            <button id="load-sample" class="button secondary">Dùng bộ mẫu này</button
+            ><button id="edit-sample" class="button ghost">Sửa dữ liệu mẫu</button
+            ><span id="sample-downloads"></span>
+          </div>
+        </details>
+      </section>
+      <section class="panel" id="configuration">
+        <div class="section-head">
+          <div class="step-title">
+            <span class="step">02</span>
+            <div>
+              <h2>Định nghĩa quy tắc đối soát</h2>
+              <p>Chọn định danh ổn định để matching, rồi chọn các giá trị cần so sánh.</p>
+            </div>
+          </div>
+          <span id="rule-count" class="format-chip">Chờ hai nguồn</span>
+        </div>
+        <fieldset id="rule-fields" disabled>
+          <div class="rule-top">
+            <label
+              >Batch ID<input
+                id="batch-id"
+                value=""
+                placeholder="Ví dụ: commission-2026-10"
+                maxlength="100"
+            /></label>
+            <p class="hint">
+              Mỗi lần chạy có run ID riêng. Input, rule version và output được giữ để truy vết trong
+              phiên.
+            </p>
+          </div>
+          <div class="sub-head">
+            <h3>Khóa matching <small>Chuỗi định danh chính xác · có thể ghép nhiều cột</small></h3>
+            <button id="add-key" class="button small ghost">+ Thêm thành phần</button>
+          </div>
+          <div class="mapping-head keys-head">
+            <span>Cột nguồn trái</span><span>Cột nguồn phải</span><span></span>
+          </div>
+          <div id="key-rows"></div>
+          <p class="hint">
+            Không tự ghép theo số tiền hoặc thời gian. Thiếu khóa matching sẽ làm batch thất bại để
+            bạn sửa dữ liệu.
+          </p>
+          <div class="sub-head comparisons-head">
+            <h3>Field so sánh</h3>
+            <button id="add-comparison" class="button small ghost">+ Thêm field</button>
+          </div>
+          <div class="table-scroll">
+            <table class="mapping-table">
+              <thead>
+                <tr>
+                  <th>Ý nghĩa / tên rule</th>
+                  <th>Cột nguồn trái</th>
+                  <th>Cột nguồn phải</th>
+                  <th>Kiểu so sánh</th>
+                  <th>Dung sai tuyệt đối</th>
+                  <th>Thiếu giá trị</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="comparison-rows"></tbody>
+            </table>
+          </div>
+          <p class="hint">
+            Decimal dùng chuỗi số, ví dụ <code>1200.50</code>; không tự bỏ dấu phân cách hàng nghìn,
+            đổi tiền tệ hay quy đổi trạng thái. Dung sai được tính theo đơn vị giá trị đầu vào.
+          </p>
+        </fieldset>
+        <div class="run-bar">
+          <div>
+            <strong id="run-ready">Upload hai nguồn để bắt đầu</strong>
+            <p id="run-description">Chọn mẫu bên trên để thử nhanh toàn bộ quy trình.</p>
+          </div>
+          <div class="run-actions">
+            <button id="cancel" class="button ghost" hidden>Hủy xử lý</button
+            ><button id="run" class="button primary" disabled>Chạy đối soát <span>→</span></button>
+          </div>
+        </div>
+        <div id="progress" class="progress-block" hidden>
+          <div>
+            <strong id="progress-label">Đang chuẩn bị dữ liệu…</strong
+            ><span id="progress-count"></span>
+          </div>
+          <progress id="progress-meter"></progress>
+          <p id="progress-detail"></p>
+        </div>
+      </section>
+      <section class="panel results" id="results">
+        <div class="section-head">
+          <div class="step-title">
+            <span class="step">03</span>
+            <div>
+              <h2>Kết quả có thể kiểm chứng</h2>
+              <p id="result-caption">Kết quả và báo cáo xuất hiện sau khi batch hoàn tất.</p>
+            </div>
+          </div>
+          <span id="result-state" class="state-chip">Chưa chạy</span>
+        </div>
+        <div class="stats">
+          <button data-filter="ALL">
+            <span>Tổng kết quả</span><strong id="stat-total">—</strong
+            ><small>Số entry, không phải tổng dòng input</small></button
+          ><button data-filter="MATCHED">
+            <span class="teal-text">Khớp</span><strong id="stat-matched">—</strong
+            ><small>Cặp dòng đủ điều kiện khớp</small></button
+          ><button data-filter="NON_MATCHED">
+            <span class="rose-text">Không khớp</span><strong id="stat-nonmatched">—</strong
+            ><small>Gồm sai lệch, chờ và thủ công</small></button
+          ><button data-filter="PENDING_RECHECK">
+            <span>Chờ kiểm tra lại</span><strong id="stat-pending">—</strong
+            ><small>Chưa đủ dữ liệu hoặc xác nhận</small></button
+          ><button data-filter="MANUAL_REVIEW">
+            <span>Kiểm tra thủ công</span><strong id="stat-manual">—</strong
+            ><small>Trùng khóa hoặc giá trị không hợp lệ</small>
+          </button>
+        </div>
+        <p class="hint">
+          Một entry có thể có nhiều trạng thái. “Chờ” và “Thủ công” có thể giao nhau và đã nằm trong
+          “Không khớp”.
+        </p>
+        <div class="result-toolbar">
+          <div class="filters">
+            <label class="sr-only" for="status-filter">Lọc trạng thái</label
+            ><select id="status-filter">
+              <option value="ALL">Tất cả kết quả</option>
+              <option value="MATCHED">MATCHED · Khớp</option>
+              <option value="NON_MATCHED">Tất cả không khớp</option>
+              <option value="AMOUNT_MISMATCH">AMOUNT_MISMATCH · Số tiền</option>
+              <option value="FEE_MISMATCH">FEE_MISMATCH · Phí</option>
+              <option value="STATUS_MISMATCH">STATUS_MISMATCH · Trạng thái gốc</option>
+              <option value="CURRENCY_MISMATCH">CURRENCY_MISMATCH · Tiền tệ</option>
+              <option value="TYPE_MISMATCH">TYPE_MISMATCH · Loại</option>
+              <option value="FIELD_MISMATCH">FIELD_MISMATCH · Giá trị</option>
+              <option value="MISSING_INTERNAL">MISSING_INTERNAL · Thiếu ở trái</option>
+              <option value="MISSING_PARTNER">MISSING_PARTNER · Thiếu ở phải</option>
+              <option value="PENDING_RECHECK">PENDING_RECHECK · Chờ</option>
+              <option value="MANUAL_REVIEW">MANUAL_REVIEW · Thủ công</option></select
+            ><input
+              id="search"
+              type="search"
+              placeholder="Tìm khóa, giá trị hoặc lỗi…"
+              aria-label="Tìm kết quả"
+              maxlength="200"
+            />
+          </div>
+          <div class="export-actions">
+            <span>Xuất bộ lọc:</span
+            ><a id="export-csv" class="button small ghost" aria-disabled="true">CSV ↧</a
+            ><a id="export-json" class="button small ghost" aria-disabled="true">JSON ↧</a
+            ><a id="export-ndjson" class="button small ghost" aria-disabled="true">NDJSON ↧</a>
+          </div>
+        </div>
+        <div class="table-scroll result-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Khóa dữ liệu</th>
+                <th>Nguồn trái</th>
+                <th>Nguồn phải</th>
+                <th>Kết quả</th>
+                <th>Chi tiết sai lệch</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="result-rows">
+              <tr>
+                <td colspan="6">
+                  <div class="empty">
+                    <span>⇄</span>
+                    <h3>Mọi dòng đều có một câu chuyện</h3>
+                    <p>
+                      Chạy đối soát để xem dòng nào khớp, khác nhau ở đâu<br />và dòng nào cần bạn
+                      kiểm tra thêm.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span id="page-label">Chưa có kết quả</span>
+          <div>
+            <button id="previous" class="button small ghost" disabled>← Trước</button
+            ><button id="next" class="button small ghost" disabled>Sau →</button>
+          </div>
+        </div>
+        <details class="output-panel">
+          <summary>Output thực tế từ package <small>entry & complete</small></summary>
+          <p class="hint">
+            <code>entry</code> là một kết quả đối soát; <code>complete</code> kết thúc luồng và chứa
+            thống kê. Complete không có nghĩa mọi dòng đều khớp. Preview dưới đây tối đa 3 entry;
+            NDJSON chứa toàn bộ event của bộ lọc.
+          </p>
+          <pre id="raw-output">Chưa có output.</pre>
+        </details>
+        <details class="activity-panel">
+          <summary>Nhật ký xử lý</summary>
+          <ol id="activity">
+            <li>Chưa có lần chạy nào.</li>
+          </ol>
+        </details>
+      </section>
+      <footer>
+        <span
+          >Built with
+          <a href="https://github.com/qpv-systems/core-reconcile"
+            >@qpv-systems/core-reconcile</a
+          ></span
+        ><span>Dữ liệu được gửi tới server này · phiên hết hạn sau 30 phút không hoạt động</span>
+      </footer>
+    </main>
+    <dialog id="detail-dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">RESULT INSPECTOR</p>
+          <h2>Chi tiết một entry</h2>
+        </div>
+        <button class="button ghost close-dialog" aria-label="Đóng chi tiết">✕</button>
+      </div>
+      <div id="detail-content"></div>
+    </dialog>
+    <dialog id="editor-dialog" class="editor-dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">SAMPLE DATA EDITOR</p>
+          <h2>Sửa dữ liệu mẫu trước khi đối soát</h2>
+        </div>
+        <button class="button ghost close-dialog" aria-label="Đóng trình sửa">✕</button>
+      </div>
+      <p class="hint">
+        Các ô luôn được giữ dưới dạng chuỗi. Thử đổi số tiền, xóa khóa, đổi trạng thái hoặc thêm một
+        khóa trùng để xem cách core phản hồi.
+      </p>
+      <div class="editor-tabs">
+        <button data-editor-side="left" class="button secondary">Nguồn trái</button
+        ><button data-editor-side="right" class="button ghost">Nguồn phải</button
+        ><button id="add-sample-row" class="button ghost">+ Thêm dòng</button>
+      </div>
+      <div id="editor-grid" class="table-scroll"></div>
+      <div class="editor-footer">
+        <span id="editor-count"></span
+        ><button id="editor-upload" class="button secondary">Upload hai nguồn</button
+        ><button id="editor-run" class="button primary">Upload & đối soát →</button>
+      </div>
+    </dialog>
+  </body>
+</html>

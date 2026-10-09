@@ -1,0 +1,428 @@
+[
+  {
+    "id": "bank",
+    "label": "Ngân hàng",
+    "icon": "▤",
+    "short": "Tiền · phí · trạng thái",
+    "description": "Payment và refund là các sự kiện riêng có cùng định danh ở hai nguồn. Bao gồm khóa trùng và số tiền thiếu.",
+    "keys": [
+      {
+        "left": "transaction_id",
+        "right": "transaction_id"
+      }
+    ],
+    "comparisons": [
+      {
+        "name": "amount",
+        "left": "amount",
+        "right": "amount",
+        "kind": "decimal",
+        "status": "AMOUNT_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "fee",
+        "left": "fee",
+        "right": "fee",
+        "kind": "decimal",
+        "status": "FEE_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "status",
+        "left": "status",
+        "right": "status",
+        "kind": "exact",
+        "status": "STATUS_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "currency",
+        "left": "currency",
+        "right": "currency",
+        "kind": "exact",
+        "status": "CURRENCY_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "type",
+        "left": "type",
+        "right": "type",
+        "kind": "exact",
+        "status": "TYPE_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      }
+    ],
+    "left": {
+      "columns": ["transaction_id", "amount", "fee", "status", "currency", "type"],
+      "rows": [
+        ["B1003", "-30.00", "0", "SUCCESS", "EUR", "REFUND"],
+        ["B1001", "100.00", "1", "SUCCESS", "VND", "PAYMENT"],
+        ["B1002", "200.00", "2", "SUCCESS", "VND", "PAYMENT"],
+        ["B1004", "50", "0", "PENDING", "VND", "PAYMENT"],
+        ["B1005", "90", "1", "SUCCESS", "VND", "PAYMENT"],
+        ["B1005", "91", "1", "SUCCESS", "VND", "PAYMENT"],
+        ["B1007", "", "0", "SUCCESS", "VND", "PAYMENT"]
+      ]
+    },
+    "right": {
+      "columns": ["transaction_id", "amount", "fee", "status", "currency", "type"],
+      "rows": [
+        ["B1001", "100.00", "1", "SUCCESS", "VND", "PAYMENT"],
+        ["B1002", "200.50", "2", "SUCCESS", "VND", "PAYMENT"],
+        ["B1003", "-30", "0", "SUCCESS", "EUR", "REFUND"],
+        ["B1004", "50", "0", "SUCCESS", "VND", "PAYMENT"],
+        ["B1005", "90", "1", "SUCCESS", "VND", "PAYMENT"],
+        ["B1006", "80", "0", "SUCCESS", "VND", "PAYMENT"],
+        ["B1007", "", "0", "SUCCESS", "VND", "PAYMENT"]
+      ]
+    }
+  },
+  {
+    "id": "commission",
+    "label": "Hoa hồng",
+    "icon": "%",
+    "short": "Thu nhập · điều chỉnh",
+    "description": "Đối chiếu commission với payout bằng cột định danh và tên field khác nhau.",
+    "keys": [
+      {
+        "left": "commission_id",
+        "right": "commission_ref"
+      }
+    ],
+    "comparisons": [
+      {
+        "name": "commission",
+        "left": "commission_amount",
+        "right": "payout",
+        "kind": "decimal",
+        "status": "AMOUNT_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "adjustment",
+        "left": "adjustment",
+        "right": "adjustment_value",
+        "kind": "decimal",
+        "status": "FIELD_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "currency",
+        "left": "currency",
+        "right": "currency",
+        "kind": "exact",
+        "status": "CURRENCY_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "state",
+        "left": "state",
+        "right": "state",
+        "kind": "exact",
+        "status": "STATUS_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "agent",
+        "left": "agent_id",
+        "right": "agent_id",
+        "kind": "exact",
+        "status": "FIELD_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      }
+    ],
+    "left": {
+      "columns": [
+        "commission_id",
+        "commission_amount",
+        "adjustment",
+        "currency",
+        "state",
+        "agent_id"
+      ],
+      "rows": [
+        ["C03", "75", "-5", "USD", "APPROVED", "A02"],
+        ["C01", "100.25", "0", "USD", "APPROVED", "A01"],
+        ["C02", "250", "10", "USD", "APPROVED", "A01"],
+        ["C04", "80", "0", "USD", "PENDING", "A03"]
+      ]
+    },
+    "right": {
+      "columns": ["commission_ref", "payout", "adjustment_value", "currency", "state", "agent_id"],
+      "rows": [
+        ["C01", "100.25", "0", "USD", "APPROVED", "A01"],
+        ["C02", "249", "10", "USD", "APPROVED", "A01"],
+        ["C03", "75", "0", "USD", "APPROVED", "A02"],
+        ["C05", "60", "0", "USD", "APPROVED", "A03"]
+      ]
+    }
+  },
+  {
+    "id": "orders",
+    "label": "Đơn hàng",
+    "icon": "▣",
+    "short": "Tổng đơn · vận chuyển",
+    "description": "Đối chiếu order nội bộ và reference của nền tảng bán hàng. Không tự quy đổi trạng thái.",
+    "keys": [
+      {
+        "left": "order_id",
+        "right": "reference_id"
+      }
+    ],
+    "comparisons": [
+      {
+        "name": "total",
+        "left": "total",
+        "right": "grand_total",
+        "kind": "decimal",
+        "status": "AMOUNT_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "shipping",
+        "left": "shipping_fee",
+        "right": "delivery_fee",
+        "kind": "decimal",
+        "status": "FEE_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "status",
+        "left": "status",
+        "right": "state",
+        "kind": "exact",
+        "status": "STATUS_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "currency",
+        "left": "currency",
+        "right": "currency",
+        "kind": "exact",
+        "status": "CURRENCY_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      }
+    ],
+    "left": {
+      "columns": ["order_id", "total", "shipping_fee", "status", "currency"],
+      "rows": [
+        ["O03", "499.99", "5", "SHIPPED", "USD"],
+        ["O01", "120", "3", "PAID", "USD"],
+        ["O02", "250", "0", "CANCELLED", "USD"],
+        ["O04", "80", "2", "PAID", "USD"]
+      ]
+    },
+    "right": {
+      "columns": ["reference_id", "grand_total", "delivery_fee", "state", "currency"],
+      "rows": [
+        ["O01", "120", "3", "PAID", "USD"],
+        ["O02", "250", "0", "PAID", "USD"],
+        ["O03", "499.99", "7", "SHIPPED", "USD"],
+        ["O05", "60", "2", "PAID", "USD"]
+      ]
+    }
+  },
+  {
+    "id": "inventory",
+    "label": "Tồn kho",
+    "icon": "▦",
+    "short": "SKU + kho · số lượng",
+    "description": "Khóa ghép SKU và kho, so sánh số lượng và lượng giữ chỗ. Không matching chỉ theo SKU.",
+    "keys": [
+      {
+        "left": "sku",
+        "right": "item_code"
+      },
+      {
+        "left": "warehouse",
+        "right": "location"
+      }
+    ],
+    "comparisons": [
+      {
+        "name": "quantity",
+        "left": "quantity",
+        "right": "qty",
+        "kind": "decimal",
+        "status": "FIELD_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "reserved",
+        "left": "reserved",
+        "right": "reserved_qty",
+        "kind": "decimal",
+        "status": "FIELD_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      }
+    ],
+    "left": {
+      "columns": ["sku", "warehouse", "quantity", "reserved"],
+      "rows": [
+        ["SKU-002", "HN", "35", "5"],
+        ["SKU-001", "HCM", "100", "10"],
+        ["SKU-001", "HN", "50", "0"],
+        ["SKU-003", "HCM", "12", "2"]
+      ]
+    },
+    "right": {
+      "columns": ["item_code", "location", "qty", "reserved_qty"],
+      "rows": [
+        ["SKU-001", "HN", "50", "0"],
+        ["SKU-001", "HCM", "99", "10"],
+        ["SKU-002", "HN", "35", "4"],
+        ["SKU-004", "HCM", "25", "0"]
+      ]
+    }
+  },
+  {
+    "id": "invoices",
+    "label": "Hóa đơn",
+    "icon": "≡",
+    "short": "Giá trị · thuế · thanh toán",
+    "description": "So sánh giá trị hóa đơn và thuế đã được tính sẵn; package không tự tính thuế hoặc netting.",
+    "keys": [
+      {
+        "left": "invoice_no",
+        "right": "invoice_number"
+      }
+    ],
+    "comparisons": [
+      {
+        "name": "net_amount",
+        "left": "net_amount",
+        "right": "subtotal",
+        "kind": "decimal",
+        "status": "AMOUNT_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "tax",
+        "left": "tax_amount",
+        "right": "tax",
+        "kind": "decimal",
+        "status": "FIELD_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "currency",
+        "left": "currency",
+        "right": "currency",
+        "kind": "exact",
+        "status": "CURRENCY_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "payment",
+        "left": "payment_status",
+        "right": "state",
+        "kind": "exact",
+        "status": "STATUS_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      }
+    ],
+    "left": {
+      "columns": ["invoice_no", "net_amount", "tax_amount", "currency", "payment_status"],
+      "rows": [
+        ["INV03", "1500", "150", "USD", "PAID"],
+        ["INV01", "9007199254740993.01", "0", "USD", "PAID"],
+        ["INV02", "2000", "200", "USD", "UNPAID"],
+        ["INV04", "500", "50", "EUR", "PAID"]
+      ]
+    },
+    "right": {
+      "columns": ["invoice_number", "subtotal", "tax", "currency", "state"],
+      "rows": [
+        ["INV01", "9007199254740993.01", "0", "USD", "PAID"],
+        ["INV02", "2000", "180", "USD", "UNPAID"],
+        ["INV03", "1500", "150", "USD", "UNPAID"],
+        ["INV04", "500", "50", "USD", "PAID"]
+      ]
+    }
+  },
+  {
+    "id": "payroll",
+    "label": "Bảng lương",
+    "icon": "♧",
+    "short": "Nhân viên + kỳ · khấu trừ",
+    "description": "Khóa ghép nhân viên và kỳ lương; so sánh gross salary và khấu trừ theo dữ liệu gốc.",
+    "keys": [
+      {
+        "left": "employee_id",
+        "right": "employee_code"
+      },
+      {
+        "left": "period",
+        "right": "pay_period"
+      }
+    ],
+    "comparisons": [
+      {
+        "name": "gross_salary",
+        "left": "gross_salary",
+        "right": "gross",
+        "kind": "decimal",
+        "status": "AMOUNT_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "deduction",
+        "left": "deduction",
+        "right": "withheld",
+        "kind": "decimal",
+        "status": "FIELD_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      },
+      {
+        "name": "currency",
+        "left": "currency",
+        "right": "currency",
+        "kind": "exact",
+        "status": "CURRENCY_MISMATCH",
+        "tolerance": "0",
+        "missing": "pending"
+      }
+    ],
+    "left": {
+      "columns": ["employee_id", "period", "gross_salary", "deduction", "currency"],
+      "rows": [
+        ["E003", "2026-10", "15000000", "500000", "VND"],
+        ["E001", "2026-10", "25000000", "2000000", "VND"],
+        ["E001", "2026-09", "25000000", "2000000", "VND"],
+        ["E002", "2026-10", "18000000", "1000000", "VND"]
+      ]
+    },
+    "right": {
+      "columns": ["employee_code", "pay_period", "gross", "withheld", "currency"],
+      "rows": [
+        ["E001", "2026-09", "25000000", "2000000", "VND"],
+        ["E001", "2026-10", "25000000", "2000000", "VND"],
+        ["E002", "2026-10", "17900000", "1000000", "VND"],
+        ["E003", "2026-10", "15000000", "600000", "VND"]
+      ]
+    }
+  }
+]

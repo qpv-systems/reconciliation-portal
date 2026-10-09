@@ -1,0 +1,5 @@
+"reference_id","grand_total","delivery_fee","state","currency"
+"O01","120","3","PAID","USD"
+"O02","250","0","PAID","USD"
+"O03","499.99","7","SHIPPED","USD"
+"O05","60","2","PAID","USD"

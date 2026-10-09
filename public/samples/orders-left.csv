@@ -1,0 +1,5 @@
+"order_id","total","shipping_fee","status","currency"
+"O03","499.99","5","SHIPPED","USD"
+"O01","120","3","PAID","USD"
+"O02","250","0","CANCELLED","USD"
+"O04","80","2","PAID","USD"

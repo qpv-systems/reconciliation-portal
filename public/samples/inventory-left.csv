@@ -1,0 +1,5 @@
+"sku","warehouse","quantity","reserved"
+"SKU-002","HN","35","5"
+"SKU-001","HCM","100","10"
+"SKU-001","HN","50","0"
+"SKU-003","HCM","12","2"
