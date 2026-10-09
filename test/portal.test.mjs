@@ -288,7 +288,8 @@ test('Playground accepts exactly 3 MB and rejects larger CSV/XLSX even with a hi
       const full = header + 'A,1\n'.repeat(Math.floor((3_000_000 - header.length) / 4)) + 'A,';
       assert.equal(Buffer.byteLength(full), 3_000_000);
       assert.equal((await upload('left', full)).size, 3_000_000);
-      for (const name of ['oversize.csv', 'oversize.xlsx']) {
+      // Repeated real uploads catch sockets reset while an early 413 is sent.
+      for (const name of ['oversize.csv', 'oversize.xlsx', 'retry.csv', 'retry.xlsx']) {
         const res = await request(`/api/sources?side=right&name=${name}`, {
           method: 'POST',
           body: full + '\n',

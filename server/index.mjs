@@ -330,7 +330,16 @@ export async function createPortal(options = {}) {
         stream.pipe(res);
       }
     } catch (error) {
-      if (error.status === 413 && !res.headersSent) res.setHeader('Connection', 'close');
+      if (error.status === 413 && !req.complete) {
+        // Drain without buffering so closing a socket with unread data does not
+        // reset the connection before the client receives the error response.
+        const drainTimeout = setTimeout(() => req.destroy(), 5_000);
+        drainTimeout.unref();
+        const clearDrainTimeout = () => clearTimeout(drainTimeout);
+        req.once('end', clearDrainTimeout);
+        req.once('close', clearDrainTimeout);
+        req.resume();
+      }
       if (!res.headersSent && !res.destroyed)
         json(res, error.status ?? 400, { error: error.message });
       else if (!res.destroyed) res.destroy();
