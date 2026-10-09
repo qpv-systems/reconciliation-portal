@@ -307,7 +307,7 @@ export async function createPortal(options = {}) {
       const asset =
         path === '/'
           ? 'public/index.html'
-          : ['/app.mjs', '/styles.css'].includes(path)
+          : ['/app.mjs', '/i18n.mjs', '/styles.css'].includes(path)
             ? `public${path}`
             : /^\/samples\/(catalog\.json|(?:bank|commission|orders|inventory|invoices|payroll)-(?:left|right)\.(?:csv|xlsx))$/.test(
                   path,

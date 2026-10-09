@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#147d73" />
+    <meta name="theme-color" content="#4f46e5" />
     <meta
       name="description"
       content="Upload CSV or Excel, choose your rules, and inspect real reconciliation results with Core Reconcile."
@@ -16,14 +16,21 @@
     <header class="header">
       <a class="brand" href="/"
         ><span class="brand-icon">⇄</span
-        ><span>reconcile<span class="brand-sub">playground by QPV Systems</span></span></a
+        ><span>reconcile<span class="brand-sub">Không gian đối soát · QPV Systems</span></span></a
       >
       <nav aria-label="Liên kết">
+        <label class="language-picker"
+          ><span aria-hidden="true">◎</span
+          ><select id="language-select" aria-label="Ngôn ngữ / Language">
+            <option value="vi">Tiếng Việt</option>
+            <option value="en">English</option>
+          </select></label
+        >
         <a
           href="https://github.com/qpv-systems/core-reconcile#readme"
           target="_blank"
           rel="noreferrer"
-          >Package docs ↗</a
+          >Tài liệu ↗</a
         ><a
           href="https://github.com/qpv-systems/reconciliation-portal"
           target="_blank"
@@ -35,7 +42,7 @@
     <main>
       <section class="hero">
         <div>
-          <p class="eyebrow">YOUR DATA. YOUR RULES.</p>
+          <p class="eyebrow">ĐỐI SOÁT DỮ LIỆU, ĐƠN GIẢN HƠN</p>
           <h1>Hai nguồn dữ liệu.<br /><span>Một bức tranh rõ ràng.</span></h1>
           <p class="hero-copy">
             Thử đối soát với dữ liệu của bạn. Chọn cột, đặt quy tắc,<br class="desktop" />
@@ -43,11 +50,28 @@
           </p>
         </div>
         <div class="hero-note">
-          <span class="live-dot"></span><strong>Powered by Core Reconcile</strong>
+          <span class="live-dot"></span><strong>Đối soát với Core Reconcile</strong>
           <p>Số tiền chính xác · Truy vết từng dòng<br />Playground · tối đa 3 MB mỗi file</p>
           <a href="#samples">Chưa có file? Thử bộ dữ liệu mẫu ↓</a>
         </div>
       </section>
+      <nav class="workflow-nav" aria-label="Các bước đối soát">
+        <a href="#sources"
+          ><span>01</span>
+          <div><strong>Dữ liệu đầu vào</strong><small>Tải file hoặc dùng mẫu</small></div>
+          <b>↗</b></a
+        >
+        <a href="#configuration"
+          ><span>02</span>
+          <div><strong>Quy tắc đối soát</strong><small>Ghép cột, chọn dung sai</small></div>
+          <b>↗</b></a
+        >
+        <a href="#results"
+          ><span>03</span>
+          <div><strong>Kết quả & báo cáo</strong><small>Kiểm tra và xuất dữ liệu</small></div>
+          <b>↗</b></a
+        >
+      </nav>
       <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
       <section class="panel" id="sources">
         <div class="section-head">
@@ -80,14 +104,14 @@
             >
             <div class="file-options">
               <label
-                >CSV delimiter<select id="left-delimiter">
+                >Dấu phân cách CSV<select id="left-delimiter">
                   <option value=",">Dấu phẩy (,)</option>
                   <option value=";">Dấu chấm phẩy (;)</option>
                   <option value="&#9;">Tab</option>
                   <option value="|">Dấu |</option>
                 </select></label
               ><label
-                >Excel sheet<input
+                >Trang tính Excel<input
                   id="left-sheet"
                   value="1"
                   aria-label="Excel sheet nguồn trái" /></label
@@ -125,14 +149,14 @@
             >
             <div class="file-options">
               <label
-                >CSV delimiter<select id="right-delimiter">
+                >Dấu phân cách CSV<select id="right-delimiter">
                   <option value=",">Dấu phẩy (,)</option>
                   <option value=";">Dấu chấm phẩy (;)</option>
                   <option value="&#9;">Tab</option>
                   <option value="|">Dấu |</option>
                 </select></label
               ><label
-                >Excel sheet<input
+                >Trang tính Excel<input
                   id="right-sheet"
                   value="1"
                   aria-label="Excel sheet nguồn phải" /></label
@@ -371,7 +395,7 @@
       </section>
       <footer>
         <span
-          >Built with
+          >Xây dựng với
           <a href="https://github.com/qpv-systems/core-reconcile"
             >@qpv-systems/core-reconcile</a
           ></span
@@ -381,7 +405,7 @@
     <dialog id="detail-dialog">
       <div class="dialog-head">
         <div>
-          <p class="eyebrow">RESULT INSPECTOR</p>
+          <p class="eyebrow">CHI TIẾT ĐỐI SOÁT</p>
           <h2>Chi tiết một entry</h2>
         </div>
         <button class="button ghost close-dialog" aria-label="Đóng chi tiết">✕</button>
@@ -391,7 +415,7 @@
     <dialog id="editor-dialog" class="editor-dialog">
       <div class="dialog-head">
         <div>
-          <p class="eyebrow">SAMPLE DATA EDITOR</p>
+          <p class="eyebrow">TRÌNH SỬA DỮ LIỆU MẪU</p>
           <h2>Sửa dữ liệu mẫu trước khi đối soát</h2>
         </div>
         <button class="button ghost close-dialog" aria-label="Đóng trình sửa">✕</button>

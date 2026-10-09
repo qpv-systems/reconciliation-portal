@@ -14,7 +14,7 @@
     "dev": "node --watch server/index.mjs",
     "test": "node --test test/portal.test.mjs",
     "test:memory": "node --max-old-space-size=64 test/memory.mjs",
-    "check": "node --check server/index.mjs && node --check server/workspace.mjs && node --check server/rows.mjs && node --check server/rules.mjs && node --check public/app.mjs",
+    "check": "node --check server/index.mjs && node --check server/workspace.mjs && node --check server/rows.mjs && node --check server/rules.mjs && node --check public/app.mjs && node --check public/i18n.mjs",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
   },
