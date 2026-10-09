@@ -1,12 +1,94 @@
 :root {
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
-  color: #243638;
-  background: #f5f7f7;
+  color: #20283f;
+  background: #f4f6fc;
   font-synthesis: none;
-  --teal: #147d73;
-  --line: #e2e9e8;
-  --muted: #748383;
-  --ink: #243638;
+  --teal: #4f46e5;
+  --line: #e4e8f2;
+  --muted: #65718a;
+  --ink: #20283f;
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+body {
+  background: radial-gradient(ellipse at 80% 0%, #e6e9ff 0, transparent 45%), #f4f6fc;
+}
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 76px;
+  background: #ffffffed;
+  backdrop-filter: blur(16px);
+}
+.language-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 10px;
+  background: #f8f9fe;
+  color: var(--teal);
+}
+.language-picker select {
+  width: auto;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  font-weight: 600;
+  padding-left: 0;
+}
+.workflow-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 30px 0;
+}
+.workflow-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  background: #ffffffc9;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.workflow-nav a:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+.workflow-nav a > span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #eef0ff;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.workflow-nav strong {
+  display: block;
+  font-size: 13px;
+}
+.workflow-nav small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.workflow-nav b {
+  margin-left: auto;
+  color: #949bb5;
 }
 * {
   box-sizing: border-box;
@@ -1263,5 +1345,272 @@ dialog pre {
   }
   .desktop {
     display: none;
+  }
+}
+/* Workspace visual refinements */
+.header {
+  height: 76px;
+  background: #ffffffed;
+}
+.header nav {
+  gap: 18px;
+}
+.brand-icon {
+  background: linear-gradient(145deg, #6258ee, #4338ca);
+  box-shadow: 0 5px 14px #4f46e526;
+}
+main {
+  padding-top: 46px;
+}
+.hero {
+  padding: 12px 0 8px;
+}
+h1 {
+  font-size: clamp(32px, 3.5vw, 46px);
+  letter-spacing: -1.8px;
+  line-height: 1.22;
+}
+.hero-copy {
+  color: var(--muted);
+  font-size: 15px;
+}
+.hero-note {
+  background: #ffffffb8;
+  border-color: #dce0f5;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px #39407a08;
+}
+.hero-note p {
+  color: var(--muted);
+}
+.panel {
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 6px 24px #29346906;
+  margin: 24px 0;
+}
+.step {
+  background: #eeedff;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.section-head {
+  margin-bottom: 26px;
+}
+h2 {
+  font-size: 19px;
+}
+.source-card {
+  border-radius: 16px;
+  background: #fbfcff;
+}
+.dropzone {
+  border-radius: 12px;
+  background: #fff;
+  border-color: #cbd1ee;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.dropzone:hover,
+.dropzone.dragover {
+  background: #f0efff;
+  border-color: var(--teal);
+}
+.upload-icon {
+  background: #eeedff;
+  color: var(--teal);
+  border-radius: 12px;
+}
+.side-label {
+  background: #eeedff;
+  color: #4f46e5;
+}
+.button {
+  border-radius: 9px;
+  min-height: 36px;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.primary {
+  box-shadow: 0 4px 12px #4f46e524;
+}
+.primary:hover {
+  background: #4338ca;
+}
+.secondary {
+  background: #eeedff;
+  border-color: #dddaff;
+}
+.secondary:hover {
+  background: #e0ddff;
+}
+.ghost {
+  color: #58647e;
+}
+.ghost:hover {
+  background: #f5f6fc;
+}
+.sample-library {
+  border-color: var(--line);
+  background: #f9faff;
+  border-radius: 14px;
+}
+.sample-card {
+  border-radius: 12px;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.sample-card.active {
+  background: #eeedff;
+  border-color: #7770ed;
+  box-shadow: 0 0 0 1px #7770ed;
+}
+.run-bar {
+  background: #f2f2ff;
+  border-color: #e1defb;
+  border-radius: 14px;
+}
+.stats {
+  gap: 10px;
+  border: 0;
+  background: transparent;
+}
+.stats button {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fafbff;
+  padding: 18px;
+}
+.stats button:last-child {
+  border: 1px solid var(--line);
+}
+.stats button:hover {
+  background: #f0efff;
+  border-color: #aaa5f3;
+}
+.stats button[data-filter='MATCHED'] {
+  background: #f0faf6;
+  border-color: #d8eee2;
+}
+.stats button[data-filter='NON_MATCHED'] {
+  background: #fff5f6;
+  border-color: #f3dfe4;
+}
+.stats strong {
+  font-variant-numeric: tabular-nums;
+}
+.result-table {
+  border-radius: 12px;
+}
+.result-table th {
+  background: #f6f7fc;
+}
+dialog {
+  border-radius: 20px;
+  box-shadow: 0 24px 80px #20283f30;
+}
+dialog::backdrop {
+  background: #20283f66;
+  backdrop-filter: blur(4px);
+}
+@media (max-width: 900px) {
+  .workflow-nav {
+    gap: 8px;
+  }
+  .workflow-nav a {
+    padding: 12px;
+    gap: 8px;
+  }
+  .workflow-nav b {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .header {
+    gap: 8px;
+    padding: 0 15px;
+  }
+  .header nav {
+    gap: 8px;
+  }
+  .header nav > a,
+  .header .version {
+    display: none;
+  }
+  .brand-sub {
+    font-size: 8px;
+    letter-spacing: 0.1px;
+  }
+  .language-picker {
+    padding: 0 6px;
+    gap: 4px;
+  }
+  .language-picker select {
+    font-size: 12px;
+    max-width: 110px;
+  }
+  main {
+    padding-top: 28px;
+  }
+  h1 {
+    font-size: 32px;
+  }
+  .hero-copy {
+    font-size: 14px;
+  }
+  .hero-note {
+    min-width: 0;
+    margin-top: 22px;
+  }
+  .workflow-nav {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 20px 0;
+  }
+  .workflow-nav a {
+    padding: 12px 14px;
+  }
+  .workflow-nav a div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+  }
+  .workflow-nav small {
+    margin: 0;
+  }
+  .workflow-nav b {
+    display: block;
+  }
+  .panel {
+    padding: 20px 15px;
+    border-radius: 16px;
+  }
+  .section-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .section-head > .button {
+    margin-left: 52px;
+  }
+  .stats button {
+    padding: 12px;
+  }
+  .stats button:last-child {
+    border: 1px solid var(--line);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
   }
 }

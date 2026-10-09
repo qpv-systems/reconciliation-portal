@@ -5,6 +5,14 @@ import { fileURLToPath } from 'node:url';
 import { createPortal } from '../server/index.mjs';
 import JSZip from 'jszip';
 
+test('Language module is served as JavaScript under the static asset allowlist', async () =>
+  usingPortal(async ({ request }) => {
+    const response = await request('/i18n.mjs');
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-type'), /text\/javascript/);
+    assert.match(await response.text(), /languagechange/);
+  }));
+
 async function usingPortal(run, options = {}) {
   const portal = await createPortal({ log: () => {}, ...options });
   portal.server.listen(0, '127.0.0.1');
