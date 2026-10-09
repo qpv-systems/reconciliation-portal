@@ -49,7 +49,7 @@ Templates are examples of explicit rules, not universal accounting policies. The
 
 ## Understand the results
 
-The UI uses **left/right** labels. Core output uses **internal/partner**; in this portal `internal` = left and `partner` = right. These are roles, not restrictions on where data came from.
+The UI uses **left/right** labels. Core output uses **internal/partner**; in this portal `internal` = left and `partner` = right. These are roles, not restrictions on where data came from. Refreshing the page restores the session's most recent run, its source previews, rules and completed results; a running job resumes progress polling. Unsaved editor cells exist only in the browser and are not restored.
 
 | Status              | Meaning                                                                                               |
 | ------------------- | ----------------------------------------------------------------------------------------------------- |

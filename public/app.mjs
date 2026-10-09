@@ -631,11 +631,42 @@ try {
   state.maxUploadBytes = session.maxUploadBytes;
   selectTemplate('bank');
   $('batch-id').value = `batch-${new Date().toISOString().slice(0, 10)}`;
-  busy(false);
-  if (session.sources.length || session.jobs.length)
+  let previous = session.jobs.at(-1);
+  if (previous) {
+    for (const side of sides) {
+      state.sources[side] = session.sources.find(
+        (source) => source.sourceId === previous.sources[side],
+      );
+      $(side + '-complete').checked = previous.completeness[side];
+      renderSource(side);
+    }
+    state.rules = clone(previous.rules);
+    $('batch-id').value = previous.batchId;
+    renderRules();
+    renderJob(previous);
+    busy(true);
+    while (['staging', 'running'].includes(previous.state)) {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      previous = await api('/api/runs/' + previous.id);
+      renderJob(previous);
+    }
+    if (previous.state === 'complete') await loadPage();
     notify(
-      'Server vẫn giữ phiên trước. Upload lại dữ liệu để chạy mới, hoặc xóa phiên để làm từ đầu.',
+      previous.error ?? 'Đã khôi phục file, quy tắc và kết quả gần nhất của phiên.',
+      previous.state !== 'complete',
     );
+  } else if (session.sources.length) {
+    for (const side of sides) {
+      state.sources[side] = session.sources.findLast((source) =>
+        source.sourceId.startsWith(side + ':'),
+      );
+      renderSource(side);
+    }
+    chooseRules();
+    notify('Đã khôi phục các file đã upload. Kiểm tra quy tắc và tính đầy đủ trước khi chạy.');
+  }
+  busy(false);
+  updateExports();
 } catch (error) {
   notify('Không kết nối được server: ' + error.message, true);
   busy(true);
